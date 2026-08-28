@@ -1,0 +1,21 @@
+{
+  "name": "AVIATOR",
+  "short_name": "AVIATOR",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f0f8ff",
+  "theme_color": "#009fe3",
+  "description": "Aplicativo AVIATOR Predictor — simula multiplicadores e conecta ao bot ElephantBet para sincronização.",
+  "icons": [
+    {
+      "src": "aviator-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "aviator-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
